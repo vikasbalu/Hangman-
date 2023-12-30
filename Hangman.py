@@ -1,63 +1,62 @@
 import random
+import json
 
-# function which random chooses words 
+# This section is used to import the json file that contain several words 
+f = open('words_dictionary.json')
+data = json.load(f)
+just_words = list(data.keys())
+
+# This section is to choose a word at random from that json file
 def choose_word():
-    words = ["python", "hangman", "programming", "computer", "science","game", "coding"]
+    words = just_words
     return random.choice(words)
 
-# function that displays words
-def display_board(chosen_word, guessed):
-    display = " "
-    for letter in chosen_word:
-        if letter in guessed:
-            display += f"{letter} "
+# This function block is to display the board in the terminal 
+def display_word(word, guessed_letters):
+    display = ""
+    for letter in word:
+        if letter in guessed_letters:
+            display += letter
         else:
-            display += "_ "
+            display += "_"
     return display
 
-# main game loop
+# The main block where the actua game takes place
 def hangman():
-    word = choose_word()
-    guessed_letters = []
-    attempts_left = 6
-
     print("Welcome to Hangman!")
+    word_to_guess = choose_word()
+    print(word_to_guess)
+    guessed_letters = []
+    max_attempts = 6
+    attempts = 0
 
-    print(display_board(word, guessed_letters))
+    while True:
+        current_display = display_word(word_to_guess, guessed_letters)
+        print("Current word:", current_display)
+        print("Guessed letters:", guessed_letters)
 
-    while attempts_left > 0 :
+        guess = input("Guess a letter: ").lower()
 
-        guess = input("\n Guess a letter: ").lower()
-        print(" The Number of attempts left are: ",attempts_left)
+        if guess in guessed_letters:
+            print("You already guessed that letter. Try again.")
+            continue
 
-        if guess.isalpha() and len(guess) == 1: # keep looping until the user wins or loses
-           
-            if guess in guessed_letters:
-                print("Already Gussed")
+        guessed_letters.append(guess)
 
-            elif guess in word:
-                    guessed_letters.append(guess)
-                    print(f"\nGood job, {guess} is in the word.")
-            
-            else:
-                attempts_left -= 1
-                print(f"\nWrong choice. You have {attempts_left} attempts left.")
-        
+        if guess not in word_to_guess:
+            attempts += 1
+            print("Incorrect guess. Attempts left:", max_attempts - attempts)
+            if attempts == max_attempts:
+                print("Sorry, you ran out of attempts. The word was:", word_to_guess)
+                break
         else:
-            print("Invalid Input")
+            print("Good guess!")
 
-        
-
-        print(display_board(word, guessed_letters))
-
-        if word==guessed_letters:
+        if set(guessed_letters) >= set(word_to_guess):
+            print("Congratulations! You guessed the word:", word_to_guess)
             break
 
-    if "-" in display_board(word, guessed_letters):
-        print("you guessed it")
-    
-    if "-" not in display_board(word, guessed_letters):
-        print("you have not  guessed it")
-     
 if __name__ == "__main__":
     hangman()
+
+ 
